@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import controllers.GameController;
+import models.Contexts;
 import models.Player;
 import statics.css.MyStyle;
 
@@ -41,11 +42,11 @@ public class RankServlet extends HttpServlet  {
 				+ "          <th>Highest Score</th>\n"
 				+ "        </tr>\n";
 		int i =1;
-		for(Player player: gameController.getRank()) {
+		for(Contexts contexts: gameController.getRank()) {
 			rs +=     "        <tr>\n"
 					+ "          <td>#" + i +"</td>\n"
-					+ "          <td>"+player.getUsername()+"</td>\n"
-					+ "          <td>"+player.getHighestScores()+"</td>\n"
+					+ "          <td>"+contexts.getPlayer().getUsername()+"</td>\n"
+					+ "          <td>"+contexts.getScoresCurrent()+"</td>\n"
 					+ "        </tr>\n";
 			i++;
 		}

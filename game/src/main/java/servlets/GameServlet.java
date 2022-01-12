@@ -37,21 +37,19 @@ public class GameServlet extends HttpServlet {
 		
 		if(tokenIsValid) {
 			
-			boolean contextsExsist = gameController.contextsExsist(username);
+			boolean contextsExsist = gameController.contextsActiveExsist(username);
 			
 			Contexts contexts = new Contexts();
 			
 			String notification = "";
 			
 			if(contextsExsist) {
-				contexts = gameController.findContextsByUsername(username);	
+				contexts = gameController.findContextsActiveByUsername(username);	
 				if(numberString != null && !numberString.equals("")) {
 					int number = Integer.parseInt(numberString);
 					if(number == contexts.getNumberCurrent() ) {
-						if(contexts.getPlayer().getHighestScores() > contexts.getScoresCurrent() +1) {
-							contexts.getPlayer().setHighestScores(contexts.getScoresCurrent() +1);
-						}
-						gameController.deleteContextsByUsername(username);
+						contexts.setScoresCurrent(contexts.getScoresCurrent() +1);
+						gameController.finishContextsByUsername(username);
 						gameController.removeToken(username);
 						resp.sendRedirect(req.getContextPath() + "/");
 						return;

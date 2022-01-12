@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -80,7 +81,6 @@ public class GameController {
 	private Player createPlayer(String username) {
 		Player player = new Player();
 		player.setUsername(username);
-		player.setHighestScores(99999);
 		player = resetToken(player);
 		players.add(player);
 		return player;
@@ -127,30 +127,43 @@ public class GameController {
 
 	public Contexts createContext(String username) {
 		Contexts contexts = new Contexts();
+		contexts.setId(UUID.randomUUID());
 		contexts.setPlayer(findPlayerByUsername(username));
 		contexts.setScoresCurrent(0);
 		Random rnd = new Random();
+		contexts.setFinish(false);
 		contexts.setNumberCurrent(rnd.nextInt(RANGE_VALUE_RANDOM)+1);
 		listContexts.add(contexts);
 		return contexts;
 	}
 
-	public List<Player> getRank(){
-		players.sort(Comparator.comparing(Player::getHighestScores));
-		return players.stream().filter(item -> item.getHighestScores() != 99999).collect(Collectors.toList());
-	}
-
-	public void deleteContextsByUsername(String username) {
-		Contexts contexts = findContextsByUsername(username);
-		if(contexts !=null) {
-			listContexts.remove(contexts);
-		}
-
+	public List<Contexts> getRank(){
+		listContexts.sort(Comparator.comparing(Contexts::getScoresCurrent));		
+		return listContexts.stream().filter(item -> item.isFinish()).collect(Collectors.toList());
 	}
 
 	public void removeToken(String username) {
 		Player player = findPlayerByUsername(username);
 		player.setExp(LocalDateTime.now().minusMinutes(10));
 		
+	}
+
+	public void finishContextsByUsername(String username) {
+		Contexts contexts = findContextsActiveByUsername(username);
+		contexts.setFinish(true);
+	}
+
+	public boolean contextsActiveExsist(String username) {
+		
+		return findContextsActiveByUsername(username) != null;
+	}
+
+	public Contexts findContextsActiveByUsername(String username) {
+		for(Contexts contexts : listContexts) {
+			if( !contexts.isFinish() && contexts.getPlayer().getUsername().equals(username)) {
+				return contexts;
+			}
+		}
+		return null;
 	}
 }
